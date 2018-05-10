@@ -355,9 +355,29 @@
 
 		// If the callback didn't return false, continue with the upload
 		if (evntResult) {
-			_load(files);
+			_loadOne(files);
 		}
 	};
+
+	var _baseFileSelectCallbackBlob = function (file) {
+		if (!file) return;
+
+		// Ensures file has meta property
+		if (!file.meta) file.meta = {};
+
+		// Dispatch the "choose" event
+		var evntResult = _dispatch("choose", {
+			file: file
+		});
+
+		// If the callback didn't return false, continue with the upload
+		if (evntResult) {
+			_loadOne(file);
+		}
+	};
+
+
+
 
 	/**
 	 * Private function that serves as a callback on file input.
@@ -409,6 +429,27 @@
 			_baseFileSelectCallback(input.files);
 		}, false);
 	};
+
+
+	/**
+	 * Use a submitButton to upload files from the field given
+	 * @param {HTMLInputElement} submitButton the button that the user has to
+	 *                           click to start the upload
+	 * @param {Blob} blob the image blob to upload
+	 * 
+	 * @param {string} filename = the filename of the object  
+	 *
+	 * @return {void}
+	 */
+	this.listenOnSubmitBlob = function (submitButton, blob, filename) {
+		if (!blob) return;
+
+		_listenTo(submitButton, "click", function () {
+			_baseFileSelectCallbackBlob(new File([blob], filename));
+		}, false);
+		
+	};
+
 
 	/**
 	 * Use a submitButton to upload files from the field given
